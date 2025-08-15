@@ -5,65 +5,65 @@ CREATE TABLE admin (
 id_admin BIGINT PRIMARY KEY,
 nombre VARCHAR(100) NOT NULL,
 apellido VARCHAR(100) NOT NULL,
-correo VARCHAR(255) UNIQUE NOT NULL,
-contraseña VARCHAR(255) NOT NULL
+correo VARCHAR(100) UNIQUE NOT NULL,
+contraseña VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE ubicaciones (
-Id_ubicacion INT AUTO_INCREMENT PRIMARY KEY,
+id_ubicacion INT AUTO_INCREMENT PRIMARY KEY,
 municipio VARCHAR(100) NOT NULL,
 cancha VARCHAR(100),
 );
 
 CREATE TABLE canchas (
-    Id_cancha INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_cancha VARCHAR(100) NOT NULL,
-    direccion VARCHAR(255),
-    Id_ubicacion INT NOT NULL,
-    FOREIGN KEY (Id_Ubicacion) REFERENCES Ubicaciones(Id_Ubicacion)
+id_cancha INT AUTO_INCREMENT PRIMARY KEY,
+nombre_cancha VARCHAR(100) NOT NULL,
+direccion VARCHAR(100),
+id_ubicacion INT NOT NULL,                         
+FOREIGN KEY (id_ubicacion) REFERENCES ubicaciones(id_ubicacion)
 )
 
 CREATE TABLE torneos (
-Id_torneo INT AUTO_INCREMENT PRIMARY KEY,
-Id_admin BIGINT NOT NULL,
+id_torneo INT AUTO_INCREMENT PRIMARY KEY,
+id_admin BIGINT NOT NULL,
 nombre_torneo VARCHAR(100) NOT NULL,
 descripcion_torneo TEXT,
 estado_torneo ENUM('Programado', 'En curso', 'Finalizado') DEFAULT 'Programado',
 tipo_torneo ENUM('Fase_De_Grupos', 'Eliminatorias', 'Liguilla') DEFAULT 'Fase_De_Grupos',
 fecha_inicio DATE NOT NULL,
 fecha_fin DATE NOT NULL,
-Id_ubicacion INT NOT NULL,
+id_ubicacion INT NOT NULL,
 reglas TEXT,
-numero_Equipos INT NOT NULL,
+numero_equipos INT NOT NULL,
 premio DECIMAL(10,2),
-FOREIGN KEY (Id_Ubicacion) REFERENCES Ubicaciones(Id_Ubicacion),
-FOREIGN KEY (Id_Admin) REFERENCES Admin(Id_Admin)
+FOREIGN KEY (id_ubicacion) REFERENCES ubicaciones(id_ubicacion),
+FOREIGN KEY (id_admin) REFERENCES admin(id_admin)
 );
 
 CREATE TABLE torneo_admin (
 id_torneo INT NOT NULL,
 id_admin BIGINT NOT NULL,
-PRIMARY KEY (Id_Torneo, Id_Admin),
-FOREIGN KEY (Id_Torneo) REFERENCES Torneos(Id_Torneo),
-FOREIGN KEY (Id_Admin) REFERENCES Admin(Id_Admin)
+PRIMARY KEY (id_torneo, id_admin),
+FOREIGN KEY (id_torneo) REFERENCES torneos(id_torneo),
+FOREIGN KEY (id_admin) REFERENCES admin(id_admin)
 );
 
-CREATE TABLE Equipos (
+CREATE TABLE equipos (
 id_equipo INT AUTO_INCREMENT PRIMARY KEY,
 nombre_equipo VARCHAR(100) NOT NULL,
 escudo VARCHAR(255),
 entrenador VARCHAR(100),
 id_ubicacion INT,
 Estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo',
-FOREIGN KEY (Id_Ubicacion) REFERENCES Ubicaciones(Id_Ubicacion)
+FOREIGN KEY (id_ubicacion) REFERENCES ubicaciones(id_ubicacion)
 );
 
 CREATE TABLE equipo_torneo (
 id_equipo INT NOT NULL,
 id_torneo INT NOT NULL,
-PRIMARY KEY (Id_Equipo, Id_Torneo),
-FOREIGN KEY (Id_Equipo) REFERENCES Equipos(Id_Equipo),
-FOREIGN KEY (Id_Torneo) REFERENCES Torneos(Id_Torneo)
+PRIMARY KEY (id_equipo, id_torneo),
+FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+FOREIGN KEY (id_torneo) REFERENCES torneos(id_torneo)
 );
 
 CREATE TABLE jugadores (
@@ -75,108 +75,108 @@ fecha_nacimiento DATE NOT NULL,
 altura DECIMAL(5,2) NOT NULL,
 Peso DECIMAL(5,2) NOT NULL,
 estado ENUM('Activo', 'Lesionado', 'Suspendido') DEFAULT 'Activo' NOT NULL,
-Id_equipo INT NOT NULL,
-FOREIGN KEY (Id_Equipo) REFERENCES Equipos(Id_Equipo)
+id_equipo INT NOT NULL,
+FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
 
 CREATE TABLE clasificacion (
 id_clasificacion INT AUTO_INCREMENT PRIMARY KEY,
-d_Torneo INT NOT NULL,
-id_Equipo INT NOT NULL,
+id_Torneo INT NOT NULL,
+id_equipo INT NOT NULL,
 partidos_jugados INT DEFAULT 0,
 partidos_ganados INT DEFAULT 0,
-Partidos_empatados INT DEFAULT 0,
+partidos_empatados INT DEFAULT 0,
 partidos_perdidos INT DEFAULT 0,
 goles_Favor INT DEFAULT 0,
 goles_Contra INT DEFAULT 0,
-diferencia_Goles INT GENERATED ALWAYS AS (Goles_Favor - Goles_Contra) STORED,
+diferencia_goles INT GENERATED ALWAYS AS (goles_Favor - goles_Contra) STORED,
 puntos INT DEFAULT 0,
-FOREIGN KEY (Id_Torneo) REFERENCES Torneos(Id_Torneo),
-FOREIGN KEY (Id_Equipo) REFERENCES Equipos(Id_Equipo),
-UNIQUE (Id_Torneo, Id_Equipo)
+FOREIGN KEY (id_torneo) REFERENCES torneos(id_torneo),
+FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+UNIQUE (id_torneo, id_equipo)
 );
 
-CREATE TABLE Partido (
-Id_Partido INT AUTO_INCREMENT PRIMARY KEY,
-Fecha DATE NOT NULL,
-Hora TIME NOT NULL,
-Id_Ubicacion INT NOT NULL,
-Id_Cancha INT NOT NULL,
-Id_Torneo INT NOT NULL,
-FOREIGN KEY (Id_Ubicacion) REFERENCES Ubicaciones(Id_Ubicacion),
-FOREIGN KEY (Id_Cancha) REFERENCES Canchas(Id_Cancha),
-FOREIGN KEY (Id_Torneo) REFERENCES Torneos(Id_Torneo)
+CREATE TABLE partido (
+id_partido INT AUTO_INCREMENT PRIMARY KEY,
+fecha DATE NOT NULL,
+hora TIME NOT NULL,
+id_ubicacion INT NOT NULL,
+id_cancha INT NOT NULL,
+id_torneo INT NOT NULL,
+FOREIGN KEY (id_ubicacion) REFERENCES ubicaciones(id_ubicacion),
+FOREIGN KEY (id_cancha) REFERENCES canchas(id_cancha),
+FOREIGN KEY (id_torneo) REFERENCES torneos(id_torneo)
 );
 
-CREATE TABLE Partido_Equipo (
-Id_Partido INT NOT NULL,
-Id_Equipo INT NOT NULL,
-PRIMARY KEY (Id_Partido, Id_Equipo),
-FOREIGN KEY (Id_Partido) REFERENCES Partido(Id_Partido),
-FOREIGN KEY (Id_Equipo) REFERENCES Equipos(Id_Equipo)
+CREATE TABLE partido_equipo (
+id_partido INT NOT NULL,
+id_equipo INT NOT NULL,
+PRIMARY KEY (id_partido, id_equipo),
+FOREIGN KEY (id_partido) REFERENCES partidos(id_partido),
+FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
 
 
 
--- Jugadores inscritos en un torneo
-CREATE TABLE JUGADOR_TORNEO (
-Id_Jugador INT NOT NULL,
-Id_Torneo INT NOT NULL,
-PRIMARY KEY (Id_Jugador, Id_Torneo),
-FOREIGN KEY (Id_Jugador) REFERENCES JUGADOR(Id_Jugador),
-FOREIGN KEY (Id_Torneo) REFERENCES TORNEO(Id_Torneo)
+-- jugadores inscritos en un torneo
+CREATE TABLE jugador_torneo (
+id_jugador INT NOT NULL,
+id_torneo INT NOT NULL,
+PRIMARY KEY (id_jugador, id_torneo),
+FOREIGN KEY (id_jugador) REFERENCES jugador(id_jugador),
+FOREIGN KEY (id_torneo) REFERENCES torneos(id_torneo)
 );
 
 -- Participación del jugador en partidos
-CREATE TABLE JUGADOR_PARTIDO (
-Id_Jugador INT NOT NULL,
-Id_Partido INT NOT NULL,
-Goles INT DEFAULT 0,
-Asistencias INT DEFAULT 0,
+CREATE TABLE jugador_partido (
+id_jugador INT NOT NULL,
+id_partido INT NOT NULL,
+goles INT DEFAULT 0,
+asistencias INT DEFAULT 0,
 Tarjetas ENUM('Ninguna', 'Amarilla', 'Roja') DEFAULT 'Ninguna',
-PRIMARY KEY (Id_Jugador, Id_Partido),
-FOREIGN KEY (Id_Jugador) REFERENCES JUGADOR(Id_Jugador),
-FOREIGN KEY (Id_Partido) REFERENCES PARTIDO(Id_Partido)
+PRIMARY KEY (id_jugador, id_partido),
+FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
+FOREIGN KEY (id_partido) REFERENCES partidos(id_partido)
 );
 
 -- Árbitros
-CREATE TABLE ARBITRO (
-Id_Arbitro INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE arbitros (
+id_arbitro INT AUTO_INCREMENT PRIMARY KEY,
 Nombre VARCHAR(100),
 Apellido VARCHAR(100)
 );
 
-CREATE TABLE ARBITRO_PARTIDO (
-    Id_Arbitro INT NOT NULL,
-    Id_Partido INT NOT NULL,
+CREATE TABLE arbitro_partido (
+    id_arbitro INT NOT NULL,
+    id_partido INT NOT NULL,
     Rol ENUM('Principal', 'Asistente', 'Cuarto Árbitro') DEFAULT 'Principal',
-    PRIMARY KEY (Id_Arbitro, Id_Partido),
-    FOREIGN KEY (Id_Arbitro) REFERENCES ARBITRO(Id_Arbitro),
-    FOREIGN KEY (Id_Partido) REFERENCES PARTIDO(Id_Partido)
+    PRIMARY KEY (id_arbitro, id_partido),
+    FOREIGN KEY (id_arbitro) REFERENCES arbitros(id_arbitro),
+    FOREIGN KEY (id_partido) REFERENCES partidos(id_partido)
 );
 
 -- Eventos durante los partidos
-CREATE TABLE EVENTO_PARTIDO (
+CREATE TABLE evento_partido (
 Id_Evento INT AUTO_INCREMENT PRIMARY KEY,
-Id_Partido INT NOT NULL,
-Id_Jugador INT NOT NULL,
-Minuto INT NOT NULL,
-Tipo ENUM('Gol', 'Asistencia', 'Cambio', 'Tarjeta Amarilla', 'Tarjeta Roja'),
-FOREIGN KEY (Id_Partido) REFERENCES PARTIDO(Id_Partido),
-FOREIGN KEY (Id_Jugador) REFERENCES JUGADOR(Id_Jugador)
+id_partido INT NOT NULL,
+id_jugador INT NOT NULL,
+minuto INT NOT NULL,
+tipo ENUM('Gol', 'Asistencia', 'Cambio', 'Tarjeta Amarilla', 'Tarjeta Roja'),
+FOREIGN KEY (id_partido) REFERENCES partidos(id_partido),
+FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
 
 -- Estadísticas acumuladas por torneo
-CREATE TABLE ESTADISTICAS_JUGADOR (
-Id_Jugador INT NOT NULL,
-Id_Torneo INT NOT NULL,
-Partidos_jugados INT DEFAULT 0,
-Goles INT DEFAULT 0,
-Asistencias INT DEFAULT 0,
-Tarjetas_Amarillas INT DEFAULT 0,
-Tarjetas_Rojas INT DEFAULT 0,
-PRIMARY KEY (Id_Jugador, Id_Torneo),
-FOREIGN KEY (Id_Jugador) REFERENCES JUGADOR(Id_Jugador),
-FOREIGN KEY (Id_Torneo) REFERENCES TORNEO(Id_Torneo)
+CREATE TABLE estadisticas_jugador (
+id_jugador INT NOT NULL,
+id_torneo INT NOT NULL,
+partidos_jugados INT DEFAULT 0,
+goles INT DEFAULT 0,
+asistencias INT DEFAULT 0,
+tarjetas_amarillas INT DEFAULT 0,
+tarjetas_rojas INT DEFAULT 0,
+PRIMARY KEY (id_jugador, id_torneo),
+FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
+FOREIGN KEY (id_torneo) REFERENCES torneos(id_torneos)
 );
 
